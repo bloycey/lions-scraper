@@ -51,7 +51,8 @@ const refineData = (data) => {
       });
     }
   }
-    console.log(JSON.stringify(games, null, 4));
+  const lionsGames = games.filter(game => game.games.length > 0);
+    console.log(JSON.stringify(lionsGames, null, 4));
 }
 
 
