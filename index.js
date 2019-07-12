@@ -14,17 +14,16 @@ getData(fetch, 'https://www.yourtv.com.au/search?q=AFL&region=75').then(data => 
 const refineData = (data) => {
   const $ = cheerio.load(data);
   let resultsArray = []
-  $('.search-result').each(function(){
-    resultsArray.push($(this).html());  
+  $('.search-list__item').each(function(){
+    resultsArray.push($(this).html());
   });
-  
+
   const brisbaneResults = resultsArray.filter(item => {
     const $ = cheerio.load(item);
-    return $('.show-brief__episode').text().includes('Brisbane'); 
-  })
+    return $('.search-result .show-brief__episode').text().includes('Brisbane'
+    ) || $.html().length < 100 })
 
   console.log(brisbaneResults);
-  console.log(brisbaneResults.length);
 }
 
 
