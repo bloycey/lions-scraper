@@ -11,20 +11,49 @@ getData(fetch, 'https://www.yourtv.com.au/search?q=AFL&region=75').then(data => 
   refineData(data);
 });
 
+
+const isShortText = (text) => text.length < 100;
+
 const refineData = (data) => {
   const $ = cheerio.load(data);
-  let resultsArray = []
-  $('.search-list__item').each(function(){
-    resultsArray.push($(this).html());
-  });
+  const items = $('.search-list__item');
 
-  const brisbaneResults = resultsArray.filter(item => {
-    const $ = cheerio.load(item);
-    return $('.search-result .show-brief__episode').text().includes('Brisbane'
-    ) || $.html().length < 100 })
+  let games = [];
+  let arrayPosition;
+  let currentArrayId;
 
-  console.log(brisbaneResults);
+  for(let i = 0; i < items.length ; i++){
+    const $ = cheerio.load(items[i]);
+    if($.html().length < 200){
+      games.push({
+        date: $('h3').text(),
+        id: i,
+        games: []
+      })
+      currentArrayId = i;
+      arrayPosition = games.length - 1;
+    }
+    if($('.search-result').html() !== null){
+      $('.search-result').each((index, item) => {
+        const parsedItem = cheerio.load(item);
+        if(parsedItem('.show-brief__episode').text().includes('Brisbane')) {
+          const title = parsedItem('.show-brief__episode').text();
+          const time = parsedItem('.search-result__time h4').text();
+          const description = parsedItem('.show-brief__description').text();
+          const duration = parsedItem('.search-result__time p').text();
+          games[arrayPosition].games.push({
+            title,
+            description,
+            time,
+            duration 
+          })
+        }
+      });
+    }
+  }
+    console.log(JSON.stringify(games, null, 4));
 }
+
 
 
 
